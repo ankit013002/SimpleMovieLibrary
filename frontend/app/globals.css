@@ -1,26 +1,162 @@
 @import "tailwindcss";
+@plugin "daisyui";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* Fonts */
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji",
+    "Segoe UI Emoji";
+  --font-display: "Sora", var(--font-sans);
+
+  /* Radii */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+  --radius-2xl: 1.5rem;
+
+  /* Brand (warm yellow like the mock) */
+  --color-brand-50: #fff9e6;
+  --color-brand-100: #fff3c2;
+  --color-brand-200: #ffe891;
+  --color-brand-300: #ffdd60;
+  --color-brand-400: #ffd43a;
+  --color-brand-500: #f5c518;
+  --color-brand-600: #e0b212;
+  --color-brand-700: #c79a0f;
+  --color-brand-800: #a57d0c;
+  --color-brand-900: #785a07;
+  --color-brand-950: #3d2f02;
+
+  /* App palette */
+  --color-bg: #0b0d14; /* page background */
+  --color-panel: #0f121a; /* base panel */
+  --color-panel-2: #151927; /* elevated panel */
+  --color-border: #23283a; /* hairlines */
+  --color-muted: #9aa4b2; /* secondary text */
+  --color-heading: #f3f5f7; /* primary text */
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    color-scheme: dark;
+  }
+
+  html,
+  body,
+  #__next {
+    height: 100%;
+  }
+  body {
+    @apply bg-black text-heading font-sans antialiased;
+    background-color: var(--color-bg);
+  }
+  ::selection {
+    background: var(--color-brand-600);
+    color: #000;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-display tracking-tight text-heading;
+  }
+
+  a {
+    @apply text-brand-400 hover:text-brand-300 underline-offset-4 hover:underline;
+  }
+
+  /* subtle scrollbars */
+  * {
+    scrollbar-color: #23283a transparent;
+    scrollbar-width: thin;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Components that match the mock */
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+
+  .panel {
+    @apply rounded-2xl bg-panel/95 border border-border/60
+      shadow-[0_0_0_1px_rgba(0,0,0,0.4),0_8px_30px_rgba(0,0,0,0.35)];
+    backdrop-filter: saturate(120%) blur(6px);
+  }
+
+  .card {
+    @apply rounded-xl bg-panel-2/90 border border-border/60 shadow-md;
+  }
+
+  .pill {
+    @apply inline-flex items-center gap-2 rounded-full bg-panel/80
+      px-3 py-1 text-sm text-muted border border-border/50;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg
+      px-4 py-2 text-sm font-medium transition-colors;
+  }
+
+  .btn-primary {
+    @apply btn bg-brand-500 text-black hover:bg-brand-400 active:bg-brand-600
+      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400;
+  }
+
+  .btn-ghost {
+    @apply btn bg-transparent text-heading/90 hover:bg-white/5 border border-white/10;
+  }
+
+  .btn-link {
+    @apply btn p-0 h-auto text-brand-400 hover:text-brand-300 underline underline-offset-4;
+    background: transparent;
+  }
+
+  .badge {
+    @apply inline-flex items-center rounded-md bg-brand-500/15 text-brand-300
+      px-2 py-0.5 text-xs border border-brand-500/20;
+  }
+
+  .section {
+    @apply border-t border-border/60;
+  }
+
+  /* movie/hero tiles */
+  .poster {
+    @apply relative overflow-hidden rounded-xl bg-black/40;
+  }
+  .poster::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.65), transparent 60%);
+  }
+}
+
+/* App-specific utilities */
+@layer utilities {
+  .bg-app-gradient {
+    background-image: radial-gradient(
+        90rem 70rem at -10% -20%,
+        #53247e 0%,
+        transparent 60%
+      ),
+      radial-gradient(80rem 60rem at 120% 120%, #0b3b77 0%, transparent 60%),
+      linear-gradient(180deg, #0b0d14 0%, #0b0d14 100%);
+    background-attachment: fixed;
+  }
+
+  .elevated {
+    @apply shadow-[0_10px_40px_-10px_rgba(0,0,0,0.6)];
+  }
+  .text-muted {
+    @apply text-muted;
+  }
+  .hairline {
+    @apply border border-border/60;
+  }
 }
