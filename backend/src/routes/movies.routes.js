@@ -1,7 +1,12 @@
 const express = require("express");
-const { getTrendingMovies } = require("../controllers/movie.controller");
+const {
+  getTrendingMovies,
+  getMovieByName,
+} = require("../controllers/movie.controller");
 const router = express.Router();
 
 router.get("/trending", getTrendingMovies);
+
+router.get("/movie-by-title", getMovieByName);
 
 module.exports = router;

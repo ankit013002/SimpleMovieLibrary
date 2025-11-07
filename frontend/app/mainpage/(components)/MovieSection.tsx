@@ -12,7 +12,9 @@ const MovieSection = () => {
 
   useEffect(() => {
     async function fetchTrendingMovies() {
-      const res = await fetch("http://localhost:5000/movies/trending");
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/movies/trending`
+      );
       const data = await res.json();
       setIsLoading(false);
       setMovies(data.movies);
@@ -21,13 +23,28 @@ const MovieSection = () => {
     fetchTrendingMovies();
   }, []);
 
-  console.log(movies);
+  const handleMovieSearch = async () => {
+    setIsLoading(true);
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/movies/movie-by-title?title=${searchInput}`
+    );
+    const data = await res.json();
+    setIsLoading(false);
+    setMovies(data.movies);
+    SetSearchInput("");
+  };
 
   return (
     <div>
-      <Search input={searchInput} setInput={SetSearchInput} />
+      <Search
+        input={searchInput}
+        setInput={SetSearchInput}
+        handleSearch={handleMovieSearch}
+      />
       {isLoading ? (
-        <span className="loading loading-infinity loading-xl"></span>
+        <div className="flex justify-center p-10">
+          <span className="loading loading-infinity loading-xl w-20"></span>
+        </div>
       ) : (
         <MovieContent movies={movies} />
       )}
