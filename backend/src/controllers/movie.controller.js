@@ -1,9 +1,14 @@
 const { handleCommonTMDBErrors } = require("../utils/handleCommonTMDBErrors");
 
 async function getTrendingMovies(req, res) {
+  const { page } = req.query;
+  console.log("HERE");
+  console.log(page);
+  console.log("HERE");
+
   try {
     const movieAPIResponse = await fetch(
-      `https://api.themoviedb.org/3/trending/movie/day?api_key=${process.env.TMDB_API}`
+      `https://api.themoviedb.org/3/trending/movie/day?page=${page}&api_key=${process.env.TMDB_API}`
     );
     const movieData = await movieAPIResponse.json();
 
@@ -16,6 +21,7 @@ async function getTrendingMovies(req, res) {
 
     res.status(200).json({
       message: `Retrieved ${movieData.results.length} movies`,
+      count: movieData.results.length,
       page: movieData.page,
       movies: movieData.results,
     });
@@ -25,10 +31,10 @@ async function getTrendingMovies(req, res) {
 }
 
 async function getMovieByName(req, res) {
-  const { title } = req.query;
+  const { title, page } = req.query;
   try {
     const movieAPIResponse = await fetch(
-      `https://api.themoviedb.org/3/search/movie?query=${title}&api_key=${process.env.TMDB_API}`
+      `https://api.themoviedb.org/3/search/movie?query=${title}&page=${page}&api_key=${process.env.TMDB_API}`
     );
     const movieData = await movieAPIResponse.json();
 
@@ -43,6 +49,7 @@ async function getMovieByName(req, res) {
 
     res.status(200).json({
       message: `Retrieved ${movieData.results.length} movies`,
+      count: movieData.results.length,
       page: movieData.page,
       movies: movieData.results,
     });
