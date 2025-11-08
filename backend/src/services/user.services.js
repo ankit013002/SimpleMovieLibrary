@@ -1,5 +1,5 @@
 const User = require("../models/user.model");
-const { hashPassword } = require("../utils/hashPassword");
+const { hashPassword, verifyPassword } = require("../utils/hashPassword");
 
 async function createUser(name, email, password) {
   const hashed = await hashPassword(password);
@@ -7,4 +7,25 @@ async function createUser(name, email, password) {
   return newUser;
 }
 
-module.exports = { createUser };
+async function logUserIn(email, password) {
+  const user = await User.findOne({ email: email });
+
+  if (!user) {
+    const err = new Error("User does not exist");
+    err.status = 404;
+    err.code = "USER_DOES_NOT_EXIST";
+    throw err;
+  }
+
+  const passwordVerification = await verifyPassword(password, user.password);
+  if (!passwordVerification) {
+    const err = new Error("Invalid Password");
+    err.status = 400;
+    err.code = "INVALID_PASSWORD";
+    throw err;
+  }
+
+  return user;
+}
+
+module.exports = { createUser, logUserIn };

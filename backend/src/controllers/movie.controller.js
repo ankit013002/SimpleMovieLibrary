@@ -2,9 +2,6 @@ const { handleCommonTMDBErrors } = require("../utils/handleCommonTMDBErrors");
 
 async function getTrendingMovies(req, res) {
   const { page } = req.query;
-  console.log("HERE");
-  console.log(page);
-  console.log("HERE");
 
   try {
     const movieAPIResponse = await fetch(
@@ -37,8 +34,6 @@ async function getMovieByName(req, res) {
       `https://api.themoviedb.org/3/search/movie?query=${title}&page=${page}&api_key=${process.env.TMDB_API}`
     );
     const movieData = await movieAPIResponse.json();
-
-    console.log(movieData);
 
     if (movieData.status_code && movieData.status_code == 7) {
       const err = new Error(movieData.status_message);

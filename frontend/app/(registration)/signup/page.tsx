@@ -2,10 +2,18 @@
 
 import { userSignUp } from "@/app/actions/authAction";
 import Link from "next/link";
-import { useActionState } from "react";
+import { useRouter } from "next/navigation";
+import { useActionState, useEffect } from "react";
 
 const SignupPage = () => {
   const [data, action, isPending] = useActionState(userSignUp, undefined);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (data?.success) {
+      router.push("/");
+    }
+  }, [data, router]);
 
   return (
     <div className="min-h-screen bg-app-gradient flex items-center justify-center px-4">

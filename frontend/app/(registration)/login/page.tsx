@@ -1,7 +1,20 @@
-import React from "react";
+"use client";
+
+import React, { useActionState, useEffect } from "react";
 import Link from "next/link";
+import { userSignIn } from "@/app/actions/authAction";
+import { useRouter } from "next/navigation";
 
 const LoginPage = () => {
+  const [data, action, isPending] = useActionState(userSignIn, undefined);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (data?.success) {
+      router.push("/");
+    }
+  }, [data, router]);
+
   return (
     <div className="min-h-screen bg-app-gradient flex items-center justify-center px-4">
       <div className="panel w-full max-w-md p-8 text-center space-y-6 elevated">
@@ -10,10 +23,11 @@ const LoginPage = () => {
           Sign in to continue watching your favorite movies
         </p>
 
-        <form className="space-y-4 text-left">
+        <form className="space-y-4 text-left" action={action}>
           <div>
             <label className="block text-sm mb-1 text-muted">Email</label>
             <input
+              name="email"
               type="email"
               placeholder="you@example.com"
               className="input input-bordered w-full bg-panel-2/80 border-border/60 focus:outline-none focus:ring-2 focus:ring-brand-500"
@@ -22,6 +36,7 @@ const LoginPage = () => {
           <div>
             <label className="block text-sm mb-1 text-muted">Password</label>
             <input
+              name="password"
               type="password"
               placeholder="••••••••"
               className="input input-bordered w-full bg-panel-2/80 border-border/60 focus:outline-none focus:ring-2 focus:ring-brand-500"
