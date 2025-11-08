@@ -1,13 +1,11 @@
 import { CiSettings, CiSearch } from "react-icons/ci";
+import NavBarAccountSection from "./NavBarAccountSection";
+import NavBarApplicationTitle from "./NavBarApplicationTitle";
 
 const Navbar = () => {
   return (
     <div className="flex justify-around p-2 items-center bg-bg shadow-md z-50">
-      <div className="flex items-center font-bold text-4xl font-[cursive]">
-        <span>Popcorn</span>
-        <span className="text-brand-500">B</span>
-        <span>ox</span>
-      </div>
+      <NavBarApplicationTitle />
       <div className="flex gap-5 items-center">
         <button>Free Movies & TV</button>
         <button>Live TV</button>
@@ -26,16 +24,7 @@ const Navbar = () => {
       <button className="btn text-xl">
         <CiSettings />
       </button>
-      <div>
-        <button className="btn flex">
-          <div className="avatar avatar-placeholder">
-            <div className="bg-blue-500 p-2 text-neutral-content rounded-full">
-              <span className="">D</span>
-            </div>
-          </div>
-          <div>Placeholder Name</div>
-        </button>
-      </div>
+      <NavBarAccountSection />
     </div>
   );
 };

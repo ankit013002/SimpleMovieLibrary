@@ -1,5 +1,6 @@
 const express = require("express");
 const moviesRouter = require("./routes/movies.routes");
+const userRouter = require("./routes/user.routes");
 const cors = require("cors");
 const app = express();
 
@@ -14,5 +15,6 @@ app.get("/health", (req, res) => {
 });
 
 app.use("/movies", moviesRouter);
+app.use("/users", userRouter);
 
 module.exports = app;
