@@ -1,5 +1,6 @@
 const { handleCommonTMDBErrors } = require("../utils/handleCommonTMDBErrors");
 const redisClient = require("../config/redis");
+const { retrieveMovieById } = require("../services/movie.services");
 
 const DEFAULT_EXPIRATION = 3600;
 
@@ -70,22 +71,11 @@ async function getMovieByName(req, res) {
 async function getMovieById(req, res) {
   const { id } = req.query;
   try {
-    // Repeated logic, need to extract this
-    const movieAPIResponse = await fetch(
-      `https://api.themoviedb.org/3/movie/${id}?api_key=${process.env.TMDB_API}`
-    );
-    const movieData = await movieAPIResponse.json();
-
-    if (movieData.status_code && movieData.status_code == 7) {
-      const err = new Error(movieData.status_message);
-      err.status = 500;
-      err.code = "API_ERROR";
-      throw err;
-    }
+    const movie = await retrieveMovieById(id);
 
     res.status(200).json({
-      message: `Retrieved ${movieData.title}`,
-      movie: movieData,
+      message: `Retrieved ${movie.title}`,
+      movie: movie,
     });
   } catch (err) {
     return handleCommonTMDBErrors(err, res);
@@ -99,20 +89,9 @@ async function getMoviesByIds(req, res) {
   try {
     await Promise.all(
       likedMovies.map(async (id) => {
-        // Repeated logic, need to extract this
-        const movieAPIResponse = await fetch(
-          `https://api.themoviedb.org/3/movie/${id}?api_key=${process.env.TMDB_API}`
-        );
-        const movieData = await movieAPIResponse.json();
+        const movie = await retrieveMovieById(id);
 
-        if (movieData.status_code && movieData.status_code == 7) {
-          const err = new Error(movieData.status_message);
-          err.status = 500;
-          err.code = "API_ERROR";
-          throw err;
-        }
-
-        movies.push(movieData);
+        movies.push(movie);
       })
     );
 
