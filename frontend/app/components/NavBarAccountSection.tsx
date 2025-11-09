@@ -63,7 +63,7 @@ const NavBarAccountSection = () => {
             style={{ positionAnchor: "--anchor-1" } as React.CSSProperties}
           >
             <li>
-              <button>Item 1</button>
+              <button onClick={() => redirect("/profile")}>Profile</button>
             </li>
             <li>
               <button onClick={() => handleSignOut()}>Sign out</button>

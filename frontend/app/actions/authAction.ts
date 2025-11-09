@@ -4,6 +4,7 @@ import { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
 import { cookies } from "next/headers";
 import { UserZodSchema } from "../zod/authValidationZod";
 import { ZodError } from "zod";
+import { UserType } from "../types/UserType";
 
 export async function userSignUp(previousState: unknown, formData: FormData) {
   const name = formData.get("name");
@@ -140,8 +141,10 @@ export async function getUserByToken(token: RequestCookie) {
 
   const data = await res.json();
 
+  const userData: UserType = data.user;
+
   if (res.ok) {
-    return { success: true, user: data.user };
+    return { success: true, user: userData };
   } else {
     return { success: false, error: data.error };
   }

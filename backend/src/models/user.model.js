@@ -15,11 +15,15 @@ const userSchema = new mongoose.Schema(
       unique: true,
       validate: {
         validator: function (value) {
-          const emailRegex = /\S+\@\S+\.\S+/;
+          const emailRegex = /\S+@\S+\.\S+/;
           return emailRegex.test(value);
         },
         message: (props) => `${props.value} is not a valid email`,
       },
+    },
+    likedMovies: {
+      type: [Number],
+      default: [],
     },
     password: {
       type: String,

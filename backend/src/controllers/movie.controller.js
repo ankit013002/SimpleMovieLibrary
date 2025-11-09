@@ -69,8 +69,8 @@ async function getMovieByName(req, res) {
 
 async function getMovieById(req, res) {
   const { id } = req.query;
-  console.log(id);
   try {
+    // Repeated logic, need to extract this
     const movieAPIResponse = await fetch(
       `https://api.themoviedb.org/3/movie/${id}?api_key=${process.env.TMDB_API}`
     );
@@ -84,7 +84,7 @@ async function getMovieById(req, res) {
     }
 
     res.status(200).json({
-      message: `Retrieved ${movieData.title} movies`,
+      message: `Retrieved ${movieData.title}`,
       movie: movieData,
     });
   } catch (err) {
@@ -92,4 +92,42 @@ async function getMovieById(req, res) {
   }
 }
 
-module.exports = { getTrendingMovies, getMovieByName, getMovieById };
+async function getMoviesByIds(req, res) {
+  const { likedMovies } = req.body;
+  const movies = [];
+
+  try {
+    await Promise.all(
+      likedMovies.map(async (id) => {
+        // Repeated logic, need to extract this
+        const movieAPIResponse = await fetch(
+          `https://api.themoviedb.org/3/movie/${id}?api_key=${process.env.TMDB_API}`
+        );
+        const movieData = await movieAPIResponse.json();
+
+        if (movieData.status_code && movieData.status_code == 7) {
+          const err = new Error(movieData.status_message);
+          err.status = 500;
+          err.code = "API_ERROR";
+          throw err;
+        }
+
+        movies.push(movieData);
+      })
+    );
+
+    res.status(200).json({
+      message: `Retrieved ${movies.length} movies`,
+      movies: movies,
+    });
+  } catch (err) {
+    return handleCommonTMDBErrors(err, res);
+  }
+}
+
+module.exports = {
+  getTrendingMovies,
+  getMovieByName,
+  getMovieById,
+  getMoviesByIds,
+};

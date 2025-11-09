@@ -33,4 +33,31 @@ async function getUserFromToken(token) {
   return user;
 }
 
-module.exports = { createUser, logUserIn, getUserFromToken };
+async function toggleLikedMovieForUser(movieId, email) {
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    const err = new Error("User does not exist");
+    err.status = 404;
+    err.code = "USER_DOES_NOT_EXIST";
+    throw err;
+  }
+
+  if (user.likedMovies.includes(movieId)) {
+    const newLikedMovies = user.likedMovies.filter((movie) => movie != movieId);
+    user.likedMovies = newLikedMovies;
+  } else {
+    user.likedMovies.push(movieId);
+  }
+
+  user.save();
+
+  return user;
+}
+
+module.exports = {
+  createUser,
+  logUserIn,
+  getUserFromToken,
+  toggleLikedMovieForUser,
+};

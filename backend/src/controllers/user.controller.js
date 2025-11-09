@@ -2,6 +2,7 @@ const {
   createUser,
   logUserIn,
   getUserFromToken,
+  toggleLikedMovieForUser,
 } = require("../services/user.services");
 const {
   handleCommonMongooseErrors,
@@ -93,6 +94,7 @@ async function getUser(req, res) {
       user: {
         name: user.name,
         email: user.email,
+        likedMovies: user.likedMovies,
       },
     });
   } catch (err) {
@@ -107,4 +109,29 @@ async function getUser(req, res) {
   }
 }
 
-module.exports = { createNewUser, loginUsesr, getUser };
+async function toggleLikedMovie(req, res) {
+  const { id, email } = req.query;
+
+  try {
+    await toggleLikedMovieForUser(id, email);
+
+    return res.status(200).json({
+      message: "Successfully modified user's liked movies list",
+    });
+  } catch (err) {
+    if (err.code === "USER_DOES_NOT_EXIST") {
+      return res.status(err.status).json({
+        message: "User does not exist",
+        error: err,
+      });
+    }
+    return handleCommonMongooseErrors(err, res);
+  }
+}
+
+module.exports = {
+  createNewUser,
+  loginUsesr,
+  getUser,
+  toggleLikedMovie,
+};

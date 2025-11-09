@@ -9,23 +9,52 @@ import Image from "next/image";
 import Link from "next/link";
 import { CiHeart } from "react-icons/ci";
 import { motion } from "framer-motion";
+import { getSession, getUserByToken } from "@/app/actions/authAction";
+import { UserType } from "@/app/types/UserType";
 
 const MoviePage = () => {
   const params = useParams();
   const [movie, setMovie] = useState<MovieDetails>();
+  const [isLikedMovie, setIsLikedMovie] = useState(false);
+  const [handleLike, setHandleLike] = useState(false);
+  const [user, setUser] = useState<UserType>();
+
+  const addToLikedMovies = async () => {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/toggle-liked-movie?id=${movie?.id}&email=${user?.email}`,
+      {
+        method: "PATCH",
+      }
+    );
+    if (res.ok) {
+      setHandleLike(!handleLike);
+    }
+  };
 
   useEffect(() => {
     async function getMovieById() {
       const movieId = params.slug;
-      const res = await fetch(
+      const movieRes = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/movies/movie-by-id?id=${movieId}`,
         { method: "GET" }
       );
-      const data = await res.json();
-      setMovie(data.movie);
+      const movieData = await movieRes.json();
+      setMovie(movieData.movie);
+      if (movieRes.ok) {
+        const token = await getSession();
+        if (token) {
+          const retrievedUser = await getUserByToken(token);
+          if (retrievedUser.success) {
+            setUser(retrievedUser.user);
+            setIsLikedMovie(
+              retrievedUser.user!.likedMovies.includes(Number(movieId))
+            );
+          }
+        }
+      }
     }
     getMovieById();
-  }, [params.slug]);
+  }, [params.slug, handleLike]);
 
   if (!movie)
     return (
@@ -111,13 +140,21 @@ const MoviePage = () => {
               priority
             />
           </div>
-
           <motion.button
+            onClick={addToLikedMovies}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            className="cursor-pointer relative flex items-center justify-center w-12 h-12 rounded-full bg-white/5 border border-border/60 backdrop-blur-md shadow-[0_0_20px_rgba(0,0,0,0.4)] hover:bg-brand-500/30 hover:border-brand-400 transition-all duration-300 group"
+            className={`cursor-pointer relative flex items-center justify-center w-12 h-12 rounded-full backdrop-blur-md shadow-[0_0_20px_rgba(0,0,0,0.4)] border transition-all duration-300 group ${
+              isLikedMovie
+                ? "bg-brand-500/30 border-brand-400 hover:bg-brand-500/40"
+                : "bg-white/5 border-border/60 hover:bg-brand-500/30 hover:border-brand-400"
+            }`}
           >
-            <CiHeart className="text-2xl text-muted group-hover:text-brand-400 transition-colors duration-300" />
+            {isLikedMovie ? (
+              <CiHeart className="text-2xl text-brand-400 fill-brand-400 transition-colors duration-300" />
+            ) : (
+              <CiHeart className="text-2xl text-muted group-hover:text-brand-400 transition-colors duration-300" />
+            )}
             <span className="absolute inset-0 rounded-full bg-brand-500/30 opacity-0 group-active:opacity-70 scale-0 group-active:scale-150 transition-all duration-300"></span>
           </motion.button>
         </div>
