@@ -67,4 +67,29 @@ async function getMovieByName(req, res) {
   }
 }
 
-module.exports = { getTrendingMovies, getMovieByName };
+async function getMovieById(req, res) {
+  const { id } = req.query;
+  console.log(id);
+  try {
+    const movieAPIResponse = await fetch(
+      `https://api.themoviedb.org/3/movie/${id}?api_key=${process.env.TMDB_API}`
+    );
+    const movieData = await movieAPIResponse.json();
+
+    if (movieData.status_code && movieData.status_code == 7) {
+      const err = new Error(movieData.status_message);
+      err.status = 500;
+      err.code = "API_ERROR";
+      throw err;
+    }
+
+    res.status(200).json({
+      message: `Retrieved ${movieData.title} movies`,
+      movie: movieData,
+    });
+  } catch (err) {
+    return handleCommonTMDBErrors(err, res);
+  }
+}
+
+module.exports = { getTrendingMovies, getMovieByName, getMovieById };

@@ -127,10 +127,6 @@ export async function userSignIn(prevState: unknown, formData: FormData) {
 }
 
 export async function getUserByToken(token: RequestCookie) {
-  const userToken = {
-    token,
-  };
-
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/retrieve-user`,
     {

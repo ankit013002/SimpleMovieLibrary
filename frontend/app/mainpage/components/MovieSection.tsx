@@ -28,7 +28,7 @@ const MovieSection = () => {
     }
 
     fetchTrendingMovies();
-  }, []);
+  }, [page]);
 
   const handleMovieSearch = async () => {
     setIsLoading(true);

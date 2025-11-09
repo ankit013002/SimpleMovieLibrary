@@ -2,17 +2,19 @@
 
 import Card from "@/app/components/Card";
 import { MovieType } from "@/app/types/MovieType";
-import { LuColumns3, LuColumns4 } from "react-icons/lu";
+import { useRouter } from "next/navigation";
 
 interface MovieContentProps {
   movies: MovieType[];
 }
 
 const MovieContent = ({ movies }: MovieContentProps) => {
+  const router = useRouter();
+
   return (
     <div className="p-5">
       {/* TODO: Implement other viewing styles
-       <div>
+      <div>
         <select className="select">
           <option defaultChecked>
             <div>
@@ -28,7 +30,16 @@ const MovieContent = ({ movies }: MovieContentProps) => {
       </div> */}
       <div className="grid grid-cols-3 gap-5">
         {movies.map((movie, index) => {
-          return <Card key={index} movie={movie} />;
+          return (
+            <button
+              onClick={() => {
+                router.push(`/movie-page/${movie.id}`);
+              }}
+              key={index}
+            >
+              <Card movie={movie} />
+            </button>
+          );
         })}
       </div>
     </div>

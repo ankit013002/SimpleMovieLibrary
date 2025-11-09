@@ -1,5 +1,6 @@
 import React from "react";
 import { MovieType } from "../types/MovieType";
+import Image from "next/image";
 
 interface CardProps {
   movie: MovieType;
@@ -12,15 +13,17 @@ const Card = ({ movie }: CardProps) => {
     <div className="card group overflow-hidden cursor-pointer transition-transform duration-300 hover:-translate-y-1 hover:elevated">
       <div className="poster aspect-2/3">
         {movie.poster_path ? (
-          <img
+          <Image
             src={`${IMAGE_BASE}${movie.poster_path}`}
             alt={movie.title}
+            fill
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
         ) : (
-          <img
+          <Image
             src={`/posternotavailable.jpg`}
             alt={movie.title}
+            fill
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
         )}
