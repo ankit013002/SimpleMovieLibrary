@@ -1,4 +1,8 @@
-const { createUser, logUserIn, getUserFromToken } = require("../services/user.services");
+const {
+  createUser,
+  logUserIn,
+  getUserFromToken,
+} = require("../services/user.services");
 const {
   handleCommonMongooseErrors,
 } = require("../utils/handleCommonMongooseErrors");
@@ -41,8 +45,6 @@ async function loginUsesr(req, res) {
   try {
     const user = await logUserIn(email, password);
 
-    console.log(user);
-
     const token = jwt.sign(
       { userId: user._id, email: user.email },
       process.env.JWT_SECRET,
@@ -75,34 +77,33 @@ async function loginUsesr(req, res) {
   }
 }
 
-async function getUser(req, res){
+async function getUser(req, res) {
   const authHeader = req.headers.authorization;
-  try{
-    const decodedToken = jwt.decode(authHeader)
-    if(!decodedToken){
+  try {
+    const decodedToken = jwt.decode(authHeader);
+    if (!decodedToken) {
       const err = new Error("No token provided");
       err.status = 400;
-      err.code = "TOKEN_DOES_NOT_EXIST"
+      err.code = "TOKEN_DOES_NOT_EXIST";
       throw err;
     }
-    const user = await getUserFromToken(decodedToken)
+    const user = await getUserFromToken(decodedToken);
     return res.status(200).json({
       message: "Successfully retrieved user",
       user: {
         name: user.name,
         email: user.email,
-      }
-    })
-  }catch(err){
-
-    if(err.code === "TOKEN_DOES_NOT_EXIST"){
+      },
+    });
+  } catch (err) {
+    if (err.code === "TOKEN_DOES_NOT_EXIST") {
       return res.status(err.status).json({
         message: "Token not provided",
-        error: err
-      })
+        error: err,
+      });
     }
 
-    return handleCommonMongooseErrors(err, res)
+    return handleCommonMongooseErrors(err, res);
   }
 }
 

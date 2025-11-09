@@ -1,13 +1,27 @@
 const { handleCommonTMDBErrors } = require("../utils/handleCommonTMDBErrors");
+const redisClient = require("../config/redis");
+
+const DEFAULT_EXPIRATION = 3600;
 
 async function getTrendingMovies(req, res) {
   const { page } = req.query;
 
   try {
-    const movieAPIResponse = await fetch(
-      `https://api.themoviedb.org/3/trending/movie/day?page=${page}&api_key=${process.env.TMDB_API}`
-    );
-    const movieData = await movieAPIResponse.json();
+    const cached = await redisClient.get(`trending-movies-${page}`);
+    let movieData = null;
+    if (cached) {
+      movieData = JSON.parse(cached);
+    } else {
+      const movieAPIResponse = await fetch(
+        `https://api.themoviedb.org/3/trending/movie/day?page=${page}&api_key=${process.env.TMDB_API}`
+      );
+      movieData = await movieAPIResponse.json();
+      redisClient.setEx(
+        `trending-movies-${page}`,
+        DEFAULT_EXPIRATION,
+        JSON.stringify(movieData)
+      );
+    }
 
     if (movieData.status_code && movieData.status_code == 7) {
       const err = new Error(movieData.status_message);
@@ -16,7 +30,7 @@ async function getTrendingMovies(req, res) {
       throw err;
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       message: `Retrieved ${movieData.results.length} movies`,
       count: movieData.results.length,
       page: movieData.page,
