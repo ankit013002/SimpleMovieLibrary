@@ -1,7 +1,7 @@
 "use client";
 
-import Card from "@/app/(components)/Card";
-import { MovieType } from "@/app/(types)/MovieType";
+import Card from "@/app/components/Card";
+import { MovieType } from "@/app/types/MovieType";
 import { LuColumns3, LuColumns4 } from "react-icons/lu";
 
 interface MovieContentProps {

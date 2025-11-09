@@ -2,6 +2,8 @@
 
 import { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
 import { cookies } from "next/headers";
+import { UserZodSchema } from "../zod/authValidationZod";
+import { ZodError } from "zod";
 
 export async function userSignUp(previousState: unknown, formData: FormData) {
   const name = formData.get("name");
@@ -13,6 +15,31 @@ export async function userSignUp(previousState: unknown, formData: FormData) {
     email,
     password,
   };
+
+  try {
+    UserZodSchema.parse(payload);
+  } catch (zodError) {
+    if (zodError instanceof ZodError) {
+      const validationErrors = new Map<PropertyKey, string[]>();
+      for (const issue of zodError.issues) {
+        const path = issue.path[0];
+        if (validationErrors.has(path)) {
+          const existingErrors = [
+            ...validationErrors.get(path)!,
+            issue.message,
+          ];
+          validationErrors.set(path, existingErrors);
+        } else {
+          validationErrors.set(path, [issue.message]);
+        }
+      }
+
+      return {
+        success: false,
+        errors: validationErrors,
+      };
+    }
+  }
 
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/signup`,
@@ -99,25 +126,27 @@ export async function userSignIn(prevState: unknown, formData: FormData) {
   }
 }
 
-
-export async function getUserByToken(token: RequestCookie){
+export async function getUserByToken(token: RequestCookie) {
   const userToken = {
-    token
-  }
+    token,
+  };
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/users/retrieve-user`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": token.value
-    },
-  })
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/retrieve-user`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token.value,
+      },
+    }
+  );
 
-  const data = await res.json()
+  const data = await res.json();
 
-  if(res.ok){
+  if (res.ok) {
     return { success: true, user: data.user };
-  }else{
-    return {success: false, error: data.error }
+  } else {
+    return { success: false, error: data.error };
   }
 }

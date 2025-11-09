@@ -28,9 +28,9 @@ async function logUserIn(email, password) {
   return user;
 }
 
-async function getUserFromToken(token){
+async function getUserFromToken(token) {
   const user = await User.findById(token.userId);
-  return user
+  return user;
 }
 
 module.exports = { createUser, logUserIn, getUserFromToken };

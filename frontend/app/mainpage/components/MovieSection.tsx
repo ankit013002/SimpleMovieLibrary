@@ -3,7 +3,7 @@
 import Search from "./Search";
 import MovieContent from "./MovieContent";
 import { useEffect, useState } from "react";
-import { MovieType } from "@/app/(types)/MovieType";
+import { MovieType } from "@/app/types/MovieType";
 
 const MovieSection = () => {
   const [searchInput, SetSearchInput] = useState("");

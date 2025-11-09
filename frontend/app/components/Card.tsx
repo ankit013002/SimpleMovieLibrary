@@ -1,5 +1,5 @@
 import React from "react";
-import { MovieType } from "../(types)/MovieType";
+import { MovieType } from "../types/MovieType";
 
 interface CardProps {
   movie: MovieType;

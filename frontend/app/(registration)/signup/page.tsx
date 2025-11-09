@@ -3,17 +3,29 @@
 import { userSignUp } from "@/app/actions/authAction";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useState } from "react";
 
 const SignupPage = () => {
   const [data, action, isPending] = useActionState(userSignUp, undefined);
   const router = useRouter();
+  const [validationErrors, setValidationErrors] =
+    useState<Map<PropertyKey, string[]>>();
 
   useEffect(() => {
     if (data?.success) {
-      router.push("/");
+      router.refresh();
+      window.location.href = "/";
+    } else if (data?.errors) {
+      queueMicrotask(() => setValidationErrors(data.errors));
     }
   }, [data, router]);
+
+  const getErrors = (field: string) =>
+    validationErrors?.get(field)?.map((msg, i) => (
+      <p key={i} className="text-red-400 text-sm mt-1">
+        {msg}
+      </p>
+    ));
 
   return (
     <div className="min-h-screen bg-app-gradient flex items-center justify-center px-4">
@@ -32,6 +44,7 @@ const SignupPage = () => {
               placeholder="John Doe"
               className="input input-bordered w-full bg-panel-2/80 border-border/60 focus:outline-none focus:ring-2 focus:ring-brand-500"
             />
+            {getErrors("name")}
           </div>
           <div>
             <label className="block text-sm mb-1 text-muted">Email</label>
@@ -41,6 +54,7 @@ const SignupPage = () => {
               placeholder="you@example.com"
               className="input input-bordered w-full bg-panel-2/80 border-border/60 focus:outline-none focus:ring-2 focus:ring-brand-500"
             />
+            {getErrors("email")}
           </div>
           <div>
             <label className="block text-sm mb-1 text-muted">Password</label>
@@ -50,10 +64,15 @@ const SignupPage = () => {
               placeholder="••••••••"
               className="input input-bordered w-full bg-panel-2/80 border-border/60 focus:outline-none focus:ring-2 focus:ring-brand-500"
             />
+            {getErrors("password")}
           </div>
 
-          <button type="submit" className="btn-primary w-full mt-4">
-            Create Account
+          <button
+            type="submit"
+            className="btn-primary w-full mt-4"
+            disabled={isPending}
+          >
+            {isPending ? "Creating..." : "Create Account"}
           </button>
         </form>
 

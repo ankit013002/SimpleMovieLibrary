@@ -1,7 +1,7 @@
 import React from "react";
-import HeaderBanner from "./(components)/HeaderBanner";
-import MovieSection from "./(components)/MovieSection";
-import HeaderBannerText from "./(components)/HeaderBannerText";
+import HeaderBanner from "./components/HeaderBanner";
+import MovieSection from "./components/MovieSection";
+import HeaderBannerText from "./components/HeaderBannerText";
 
 const page = () => {
   return (
