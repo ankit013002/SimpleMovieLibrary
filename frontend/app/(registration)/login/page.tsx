@@ -11,7 +11,8 @@ const LoginPage = () => {
 
   useEffect(() => {
     if (data?.success) {
-      router.push("/");
+      router.refresh();
+      window.location.href = "/";
     }
   }, [data, router]);
 

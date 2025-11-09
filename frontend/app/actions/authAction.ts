@@ -1,5 +1,6 @@
 "use server";
 
+import { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
 import { cookies } from "next/headers";
 
 export async function userSignUp(previousState: unknown, formData: FormData) {
@@ -52,8 +53,8 @@ export async function getSession() {
 
 export async function signOutUser() {
   const cookieStore = await cookies();
-  const res = cookieStore.delete("session");
-  return { res };
+  cookieStore.delete("session");
+  return { success: true };
 }
 
 export async function userSignIn(prevState: unknown, formData: FormData) {
@@ -95,5 +96,28 @@ export async function userSignIn(prevState: unknown, formData: FormData) {
   } else {
     console.error("Login failed", data);
     return { success: false, error: data.message || "Login failed" };
+  }
+}
+
+
+export async function getUserByToken(token: RequestCookie){
+  const userToken = {
+    token
+  }
+
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/users/retrieve-user`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": token.value
+    },
+  })
+
+  const data = await res.json()
+
+  if(res.ok){
+    return { success: true, user: data.user };
+  }else{
+    return {success: false, error: data.error }
   }
 }

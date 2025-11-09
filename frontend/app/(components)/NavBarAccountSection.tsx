@@ -1,22 +1,30 @@
 "use client";
 
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { getSession, signOutUser } from "../actions/authAction";
+import { getSession, getUserByToken, signOutUser } from "../actions/authAction";
 
 const NavBarAccountSection = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState<{ name: string; email: string }>();
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     async function doesCookieExist() {
       const token = await getSession();
       if (token) {
         setIsLoggedIn(true);
+        const retrievedUser = await getUserByToken(token);
+        if (retrievedUser.success) {
+          setUser(retrievedUser.user);
+        }
       }
+      setIsLoading(false);
     }
 
     doesCookieExist();
-  });
+  }, []);
 
   const goToLogin = () => {
     redirect("/login");
@@ -24,12 +32,17 @@ const NavBarAccountSection = () => {
 
   const handleSignOut = async () => {
     await signOutUser();
-    redirect("/");
+    router.refresh();
+    window.location.reload();
   };
 
   return (
     <div>
-      {isLoggedIn ? (
+      {isLoading ? (
+        <div className="flex justify-center">
+          <span className="loading loading-infinity loading-sm"></span>
+        </div>
+      ) : isLoggedIn ? (
         <>
           <button
             className="btn flex"
@@ -41,7 +54,7 @@ const NavBarAccountSection = () => {
                 <span className="">D</span>
               </div>
             </div>
-            <div>Placeholder Name</div>
+            <div>{user?.name}</div>
           </button>
           <ul
             className="dropdown menu w-52 rounded-box bg-base-100 shadow-sm"
